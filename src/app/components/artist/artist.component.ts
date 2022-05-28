@@ -16,21 +16,23 @@ export class ArtistComponent implements OnInit {
   sanitizer:any;
 
   constructor(private router:ActivatedRoute, private spotify:SpotifyService, sanitizer:DomSanitizer) {
-    this.loadingArtist=true
-    this.sanitizer = sanitizer;
-    this.router.params.subscribe(params=>{
-      this.getArtista(params['id']);
-      this.getTopTracks(params['id']);
+
+    this.spotify.GetTokenProm().then(token=>{
       
-    });
-    
+      this.sanitizer = sanitizer;
+      this.router.params.subscribe(params=>{
+        this.getArtista(params['id']);
+        this.getTopTracks(params['id']);
+        
+      });
+      this.loadingArtist=true
+    })
    }
 
   ngOnInit(): void {
   }
 
   getArtista(id:string){
-    this.loadingArtist=true;
     
     this.spotify.getArtista(id).subscribe(
       (artista: any)=>{

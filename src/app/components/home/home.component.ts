@@ -18,18 +18,25 @@ export class HomeComponent implements OnInit {
     this.loading=true
     this.error=false
 
-    this.spotify.getRealeases()
-    .subscribe((data:any)=>{
-      this.NuevasCanciones=data.albums.items;
-      this.loading=false
-      console.log("this.spotify.getrealeases")
-      console.log(data.albums.items)
-    },(errorServicio:any)=>{
-      this.loading=false;
-      this.error=true;
-      console.log(errorServicio)
-      this.mensajeError
-    });
+    this.spotify.GetTokenProm().then(token=>{
+
+
+      this.spotify.getRealeases()
+      .subscribe((data:any)=>{
+        this.NuevasCanciones=data.albums.items;
+        this.loading=false
+        console.log("this.spotify.getrealeases")
+        console.log(data.albums.items)
+      },(errorServicio:any)=>{
+        this.loading=false;
+        this.error=true;
+        console.log(errorServicio)
+        this.mensajeError
+      })}
+    );
+
+
+    
    }
 
   ngOnInit(): void {

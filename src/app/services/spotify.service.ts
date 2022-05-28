@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import {HttpClient,HttpHeaders}from '@angular/common/http'
-import { map } from 'rxjs/operators';
+import { buffer, map } from 'rxjs/operators';
 import { Data } from '@angular/router';
 
 
@@ -13,11 +13,32 @@ export class SpotifyService {
   constructor(private http:HttpClient) {
     console.log("Spotify Service is Ready")
 
+  };
+  
+  token:string | undefined;
+  
+  
+
+  GetTokenProm():Promise<any>{
+    const clientID='6555a53d29a44d5f859606d49984a488';
+    const clientSecret='73f98f5f7e194834bc0eb72e6c2dad45';
+    const url='https://accounts.spotify.com/api/token';
+
+    let body = new URLSearchParams();
+    body.set('grant_type', 'client_credentials')
+
+    let headers = new HttpHeaders().set('Authorization','Basic '+btoa(clientID+':'+ clientSecret)).set('Content-Type','application/x-www-form-urlencoded');
+    
+    
+    
+    return this.http.post<any>(url,body,{headers:headers}).toPromise().then((data)=>{
+      this.token=data.access_token
+    }).catch();
+  
   }
 
-
   GetToken(){
-    return "Bearer "+"BQAR1KqJGvITB3TKZ7kE79HbejLYJkEcV-svqbhv1niUl935K0cxvnOEaR1QPvjsjsBh5pgft8ROMsTWRz9Fg01naFJvJtTJQ0E9OSTm6PVD0xCulQr7PeRDdjMjJlPx1KoC4vKUvkCM9gofe0WUDfqsWF4bR059O02jCYRe0dytgoq9g4HJWw1faEZhUtfCczI"
+    return  'Bearer '+this.token;
   }
 
 
@@ -26,13 +47,13 @@ export class SpotifyService {
   
   
   GetQuery(query:string, headersOver?:HttpHeaders){
+    
     const url=`https://api.spotify.com/v1/${query}`;
     if (query && headersOver) {
       return this.http.get(url,{headers:headersOver});
     }
     else{
-      const headers = new HttpHeaders({'Authorization':this.GetToken()});
-
+      let headers = new HttpHeaders({'Authorization':this.GetToken()});
       return this.http.get(url,{headers:headers});
     }
     
